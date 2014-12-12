@@ -111,14 +111,17 @@ public class BookResource {
 
 			while (rs.next()) {
 				Book book = new Book();
+				
+				book.setBookid(rs.getInt("bookid"));
+				book.setTitle(rs.getString("title"));
 				book.setAuthor(rs.getString("author"));
+				book.setLanguage(rs.getString("language"));
 				book.setEdition(rs.getInt("edition"));
 				book.setEditionDate(rs.getString("editionDate"));
-				book.setLanguage(rs.getString("language"));
-				book.setPrintingDate(rs.getString("printingDate"));
 				book.setPublisher(rs.getString("publisher"));
-				book.setTitle(rs.getString("title"));
+				book.setPrintingDate(rs.getString("printingDate"));		
 				lastBook = rs.getInt("bookid");
+				
 				if (first) {
 					first = false;
 					books.setFirstBook(lastBook);
@@ -504,7 +507,8 @@ public class BookResource {
 			stmt.setString(1, title);
 			ResultSet rs = stmt.executeQuery();
 			if (rs.next()) {
-
+				
+				book.setBookid(rs.getInt("bookid"));
 				book.setTitle(rs.getString("title"));
 				book.setAuthor(rs.getString("author"));
 				book.setLanguage(rs.getString("language"));

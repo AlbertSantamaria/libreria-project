@@ -21,6 +21,7 @@ public class Book {
 			@InjectLink(resource = BookResource.class, style = Style.ABSOLUTE, rel = "self edit", title = "Libro", type = MediaType.LIBRERIA_API_BOOK, method = "getBook", bindings = @Binding(name = "title", value = "${instance.title}")) })
 	private List<Link> links;
 
+	private int bookid;
 	private String title;
 	private String author;
 	private String language;
@@ -28,6 +29,15 @@ public class Book {
 	private String editionDate;
 	private String printingDate;
 	private String publisher;
+
+	
+	public int getBookid() {
+		return bookid;
+	}
+
+	public void setBookid(int bookid) {
+		this.bookid = bookid;
+	}
 
 	public String getTitle() {
 		return title;

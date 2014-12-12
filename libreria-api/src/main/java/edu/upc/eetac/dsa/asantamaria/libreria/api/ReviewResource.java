@@ -29,7 +29,9 @@ import javax.ws.rs.core.SecurityContext;
 
 import com.mysql.jdbc.Statement;
 
+import edu.upc.eetac.dsa.asantamaria.libreria.api.model.Book;
 import edu.upc.eetac.dsa.asantamaria.libreria.api.model.Review;
+import edu.upc.eetac.dsa.asantamaria.libreria.api.model.ReviewCollection;
 
 @Path("/reviews")
 public class ReviewResource {
@@ -37,6 +39,7 @@ public class ReviewResource {
 
 	private String INSERT_REVIEW = "insert into reviews(username, name, bookid, content) values (?, ?, ?, ?)";
 	private String GET_REVIEW_BY_ID = "select * from reviews where reviewid = ?";
+	private String GET_REVIEW_BY_BOOKID = "select * from reviews where bookid = ?";
 	private String DELETE_REVIEW = "delete from reviews where reviewid=?";
 	private String UPDATE_REVIEW = "update reviews set content=ifnull(?, content) where reviewid=?";
 	private String GET_REVIEW_BY_USER = "select * from reviews where username = ? and bookid = ?";
@@ -45,7 +48,7 @@ public class ReviewResource {
 
 	@GET
 	@Path("/{reviewid}")
-	@Produces(MediaType.LIBRERIA_API_BOOK)
+	@Produces(MediaType.LIBRERIA_API_REVIEW)
 	public Review getReview(@PathParam("reviewid") int reviewid ) {
 		Review review=new Review();
 
@@ -83,6 +86,52 @@ public class ReviewResource {
 		}
 
 		return review;
+	}
+	
+	@GET
+	@Path("/reviewer/{bookid}")
+	@Produces(MediaType.LIBRERIA_API_REVIEW_COLLECTION)
+	public ReviewCollection getReviewByBookId(@PathParam("bookid") int bookid ) {
+		Review review=new Review();
+		ReviewCollection rc= new ReviewCollection();
+		
+		Connection conn = null;
+		try {
+			conn = ds.getConnection();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		PreparedStatement stmt = null;
+		try {
+			stmt = conn.prepareStatement(GET_REVIEW_BY_BOOKID);
+			stmt.setInt(1, bookid);
+
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				review.setReviewid(rs.getInt("reviewid"));
+				review.setBookId(rs.getInt("bookid"));
+				review.setUsername(rs.getString("username"));
+				review.setName(rs.getString("name"));
+				review.setContent(rs.getString("content"));
+				review.setCreationTimestamp(rs.getTimestamp("lastModified").getTime());
+				review.setLastModified(rs.getTimestamp("creationTimestamp").getTime());
+				
+				rc.addReview(review);
+				
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null)
+					stmt.close();
+				conn.close();
+			} catch (SQLException e) {
+			}
+		}
+
+		return rc;
 	}
 
 	// Crear review
